@@ -49,14 +49,33 @@ app.get('/todos/:id', (request, response) => {
     Todo.findById(id)
         .then((documents) => {
             if (!documents) {
-                response.status(404).send();
+                return response.status(404).send();
             }
 
-            return response.send({ documents });
+            response.send({ documents });
         })
         .catch((error) => {
             response.status(400).send();
         });
+});
+
+app.delete('/todos/:id', (request, response) => {
+    var id = request.params.id;
+    if(!ObjectID.isValid(id)){
+        return response.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id)
+    .then((documents) => {
+        if(!documents){
+            return response.status(404).send();
+        }
+    
+        response.send({ documents });
+    })
+    .catch((error) => {
+        response.status(400).send();
+    });
 });
 
 app.listen(port, () => {
