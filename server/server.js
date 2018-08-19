@@ -19,9 +19,7 @@ var app = express();
 app.use(bodyParser.json());
 
 app.post('/todos', (request, response) => {
-    var todo = new Todo({
-        text: request.body.text
-    });
+    var todo = new Todo(request.body);
 
     todo.save()
         .then((document) => {
