@@ -14,7 +14,9 @@ const todos = [
     },
     {
         _id: new ObjectID(),
-        text: 'Second test todo.'
+        text: 'Second test todo.',
+        completed: true,
+        completedAt: 333
     }
 ];
 
@@ -181,6 +183,70 @@ it('should return 404 if todo not found', (done) => {
 it('should return 404 if invalid ObjectID', (done) => {
     request(app)
         .delete('/todos/123')
+        .expect(404)
+        .expect((response) => {
+            expect(response.body.documents).toBe();
+        })
+        .end(done);
+    });
+
+});
+
+describe('PATCH /todos:id', () => {
+    
+it('should update the todo', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var text = 'The text is updated for first todo through a testcase.'
+    
+    request(app)
+    .patch(`/todos/${hexId}`)
+    .send({ 
+        text: text, 
+        completed: true
+    })
+    .expect(200)
+    .expect((response) => {
+        expect(response.body.documents.text).toBe(text);
+        expect(response.body.documents.completed).toBe(true);
+        expect(response.body.documents.completedAt).toBeA('number');
+    })
+    .end(done);
+});
+
+it('should clear completedAt when todo is not completed', (done) => {
+    var hexId = todos[1]._id.toHexString();
+    var text = 'The text is updated for second todo through a testcase.'
+
+    request(app)
+    .patch(`/todos/${hexId}`)
+    .send({
+        text: text,
+        completed: false
+    })
+    .expect(200)
+    .expect((response) => {
+        expect(response.body.documents.text).toBe(text);
+        expect(response.body.documents.completed).toBe(false);
+        expect(response.body.documents.completedAt).toNotExist();
+    })
+    .end(done);
+});
+
+it('should return 404 if todo not found', (done) => {
+    var hexId = new ObjectID().toHexString();
+        
+    request(app)
+        .patch(`/todos/${hexId}`)
+        .expect(404)
+        .expect((response) => {
+            expect(response.body.documents).toBe();
+        })
+        .end(done);
+});
+        
+it('should return 404 if invalid ObjectID', (done) => {
+    request(app)
+        .patch('/todos/123')
         .expect(404)
         .expect((response) => {
             expect(response.body.documents).toBe();
