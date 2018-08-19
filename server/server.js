@@ -1,4 +1,6 @@
-var port = process.env.PORT || 3000;
+require('./config/config.js');
+
+var port = process.env.PORT;
 
 //NodeJs and third party modules
 const express = require('express');
